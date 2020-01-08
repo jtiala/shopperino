@@ -1,7 +1,7 @@
 {
   "name": "shopperino",
   "version": "0.1.0",
-  "description": "Shopperino is a Firebase-based personal shopping list web app",
+  "description": "Shopperino is a Firebase-based shopping list web app",
   "keywords": [
     "shopping",
     "shopping list"

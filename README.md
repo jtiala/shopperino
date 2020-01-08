@@ -5,7 +5,7 @@
 [![Dev Dependencies Status][devdependencies-status-badge]][devdependencies-status]
 [![License][license-badge]](license)
 
-Shopperino is [Firebase][firebase]-based personal shopping list web app.
+Shopperino is [Firebase][firebase]-based shopping list web app.
 
 ## Pre-requisites
 
