@@ -25,6 +25,7 @@ const AddItem: React.FC = () => {
           uid: user.uid,
           timestamp: new Date().getTime()
         })
+        .then(() => setTitle(""))
         .catch((err: string) => {
           setError(err);
         });
