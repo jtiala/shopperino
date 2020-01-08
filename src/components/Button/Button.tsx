@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 interface Props {
+  type?: "button" | "reset" | "submit";
   children?: React.ReactNode;
   onClick?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   size?: "normal" | "small" | "large";
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const Button: React.FC<Props> = ({
+  type = "button",
   children,
   onClick,
   size = "normal",

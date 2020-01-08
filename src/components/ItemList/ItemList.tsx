@@ -12,7 +12,7 @@ const ItemList: React.FC = () => {
   const classes = classNames(["flex", "flex-col"]);
 
   const [snapshot, loading, error] = useCollection(
-    firestore.collection("items").orderBy("title")
+    firestore.collection("items").orderBy("timestamp", "desc")
   );
 
   if (loading) {
