@@ -38,7 +38,7 @@ Start interactive test runner
 
 ## Production
 
-Create a Firebase project or use the one you created for production.
+Create a Firebase project or use the one you created for development.
 
 Duplicate `.env.example` as `.env` and edit in your details
 
@@ -51,6 +51,10 @@ Install dependencies
 Build the production bundle
 
     npm run build
+
+Deploy to Firebase
+
+    firebase deploy
 
 ## License
 
