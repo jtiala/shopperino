@@ -20,7 +20,8 @@ const firestore = firebase.firestore();
 firebase.firestore().enablePersistence();
 
 const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 const analytics = firebase.analytics();
 
-export { firebase, firestore, auth, analytics };
+export { firebase, firestore, auth, googleProvider, analytics };
