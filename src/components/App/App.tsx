@@ -9,7 +9,7 @@ import Spinner from "../Spinner/Spinner";
 import Alert from "../Alert/Alert";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
-import ItemList from "../ItemList/ItemList";
+import MainView from "../MainView/MainView";
 
 const App: React.FC = () => {
   const classes = classNames(["flex", "flex-col"]);
@@ -26,7 +26,7 @@ const App: React.FC = () => {
     }
 
     if (user) {
-      return <ItemList />;
+      return <MainView />;
     }
 
     return <SignInView />;

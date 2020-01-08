@@ -2,10 +2,10 @@ import React from "react";
 import classNames from "classnames";
 
 interface Props {
-  name: string;
+  title: string;
 }
 
-const Item: React.FC<Props> = ({ name }) => {
+const Item: React.FC<Props> = ({ title }) => {
   const classes = classNames([
     "flex",
     "flex-grow",
@@ -14,10 +14,10 @@ const Item: React.FC<Props> = ({ name }) => {
     "flex-wrap",
     "bg-gray-200",
     "p-4",
-    "m-1"
+    "mb-1"
   ]);
 
-  return <li className={classes}>{name}</li>;
+  return <li className={classes}>{title}</li>;
 };
 
 export default Item;

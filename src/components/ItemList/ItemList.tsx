@@ -1,46 +1,39 @@
 import React from "react";
 import classNames from "classnames";
+import { useCollection } from "react-firebase-hooks/firestore";
+
+import { firestore } from "../../firebase";
 
 import Item from "../Item/Item";
-
-const items = [
-  {
-    id: 1,
-    name: "Olutta"
-  },
-  {
-    id: 2,
-
-    name: "Olutta"
-  },
-  {
-    id: 3,
-    name: "Olutta"
-  },
-  {
-    id: 4,
-    name: "Olutta"
-  },
-  {
-    id: 5,
-    name: "Suklaata"
-  },
-  {
-    id: 6,
-    name: "Olutta"
-  }
-];
+import Spinner from "../Spinner/Spinner";
+import Alert from "../Alert/Alert";
 
 const ItemList: React.FC = () => {
   const classes = classNames(["flex", "flex-col"]);
 
-  return (
-    <ul className={classes}>
-      {items.map(item => (
-        <Item key={item.id} {...item} />
-      ))}
-    </ul>
+  const [snapshot, loading, error] = useCollection(
+    firestore.collection("items").orderBy("title")
   );
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (snapshot) {
+    if (snapshot.docs.length < 1) {
+      return <Alert variant="warning" message="No items!" />;
+    }
+
+    return (
+      <ul className={classes}>
+        {snapshot.docs.map(doc => {
+          return <Item key={doc.id} title={doc.data().title} />;
+        })}
+      </ul>
+    );
+  }
+
+  return <Alert variant="error" title="Error" message={error?.message} />;
 };
 
 export default ItemList;
