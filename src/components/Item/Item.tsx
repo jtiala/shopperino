@@ -50,7 +50,7 @@ const Item: React.FC<Props> = ({ id, title }) => {
   ]);
 
   return (
-    <li className={classes}>
+    <div className={classes}>
       {error.length > 0 && <Alert title="Error" message={error} />}
 
       <input
@@ -59,7 +59,7 @@ const Item: React.FC<Props> = ({ id, title }) => {
         onChange={handleChange}
       />
       {title}
-    </li>
+    </div>
   );
 };
 

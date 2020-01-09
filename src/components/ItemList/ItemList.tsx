@@ -1,44 +1,31 @@
 import React from "react";
 import classNames from "classnames";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-
-import { auth, firestore } from "../../firebase";
+import { animated, useTransition } from "react-spring";
 
 import Item from "../Item/Item";
-import Spinner from "../Spinner/Spinner";
-import Alert from "../Alert/Alert";
 
-const ItemList: React.FC = () => {
+interface Props {
+  docs: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>[];
+}
+
+const ItemList: React.FC<Props> = ({ docs }) => {
+  const transition = useTransition(docs, doc => doc.id, {
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 }
+  });
+
   const classes = classNames(["flex", "flex-col"]);
-  const [user] = useAuthState(auth);
 
-  const [snapshot, loading, error] = useCollection(
-    firestore
-      .collection("items")
-      .where("uid", "==", user?.uid)
-      .orderBy("timestamp", "desc")
+  return (
+    <ul className={classes}>
+      {transition.map(({ item, props, key }) => (
+        <animated.li key={item.id} style={props}>
+          <Item id={item.id} title={item.data()?.title} />
+        </animated.li>
+      ))}
+    </ul>
   );
-
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (snapshot) {
-    if (snapshot.docs.length < 1) {
-      return <Alert variant="warning" message="No items!" />;
-    }
-
-    return (
-      <ul className={classes}>
-        {snapshot.docs.map(doc => {
-          return <Item key={doc.id} id={doc.id} title={doc.data().title} />;
-        })}
-      </ul>
-    );
-  }
-
-  return <Alert variant="error" title="Error" message={error?.message} />;
 };
 
 export default ItemList;
