@@ -32,7 +32,7 @@ const ItemList: React.FC = () => {
     return (
       <ul className={classes}>
         {snapshot.docs.map(doc => {
-          return <Item key={doc.id} title={doc.data().title} />;
+          return <Item key={doc.id} id={doc.id} title={doc.data().title} />;
         })}
       </ul>
     );
