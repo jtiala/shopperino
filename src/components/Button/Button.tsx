@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 interface Props {
   type?: "button" | "reset" | "submit";
+  disabled?: boolean;
   children?: React.ReactNode;
   onClick?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   size?: "normal" | "small" | "large";
@@ -11,6 +12,7 @@ interface Props {
 
 const Button: React.FC<Props> = ({
   type = "button",
+  disabled = false,
   children,
   onClick,
   size = "normal",
@@ -33,7 +35,7 @@ const Button: React.FC<Props> = ({
   ]);
 
   return (
-    <button className={classes} onClick={onClick}>
+    <button className={classes} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );
