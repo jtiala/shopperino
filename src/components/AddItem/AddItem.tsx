@@ -40,7 +40,7 @@ const AddItem: React.FC = () => {
         value={title}
         placeholder="milk, butter, eggs..."
       />
-      <Button type="submit" variant="primary">
+      <Button type="submit" variant="primary" disabled={title.length < 1}>
         Add
       </Button>
       {error.length > 0 && <Alert title="Error" message={error} />}
