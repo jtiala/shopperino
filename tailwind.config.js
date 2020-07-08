@@ -3,5 +3,8 @@ module.exports = {
     extend: {}
   },
   variants: {},
-  plugins: []
+  plugins: [],
+  purge: [
+    './src/**/*.tsx'
+  ]
 }
