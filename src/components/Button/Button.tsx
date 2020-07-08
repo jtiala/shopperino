@@ -16,7 +16,7 @@ const Button: React.FC<Props> = ({
   children,
   onClick,
   size = "normal",
-  variant = "default"
+  variant = "default",
 }) => {
   const normalClasses = ["p-2", "text-base"];
   const smallClasses = ["p-1", "text-xs"];
@@ -31,7 +31,7 @@ const Button: React.FC<Props> = ({
     size === "small" && smallClasses,
     size === "large" && largeClasses,
     variant === "default" && defaultClasses,
-    variant === "primary" && primaryClasses
+    variant === "primary" && primaryClasses,
   ]);
 
   return (

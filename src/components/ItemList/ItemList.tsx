@@ -9,10 +9,10 @@ interface Props {
 }
 
 const ItemList: React.FC<Props> = ({ docs }) => {
-  const transition = useTransition(docs, doc => doc.id, {
+  const transition = useTransition(docs, (doc) => doc.id, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
-    leave: { opacity: 0 }
+    leave: { opacity: 0 },
   });
 
   const classes = classNames(["flex", "flex-col"]);

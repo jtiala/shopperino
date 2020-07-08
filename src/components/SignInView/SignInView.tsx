@@ -11,7 +11,7 @@ const SignInView: React.FC = () => {
     "flex-col",
     "self-center",
     "max-w-md",
-    "m-6"
+    "m-6",
   ]);
 
   const signInWithGoogle = () => {

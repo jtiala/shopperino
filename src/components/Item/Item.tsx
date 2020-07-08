@@ -32,7 +32,7 @@ const Item: React.FC<Props> = ({ id, title }) => {
     "flex-wrap",
     "bg-gray-200",
     "p-4",
-    "mb-1"
+    "mb-1",
   ]);
 
   const checkboxClasses = classNames([
@@ -46,7 +46,7 @@ const Item: React.FC<Props> = ({ id, title }) => {
     "leading-tight",
     "focus:outline-none",
     "focus:bg-gray-100",
-    "focus:border-teal-500"
+    "focus:border-teal-500",
   ]);
 
   return (

@@ -13,7 +13,7 @@ const Title: React.FC = () => {
     "font-semibold",
     "text-xl",
     "tracking-tight",
-    "hover:text-gray-200"
+    "hover:text-gray-200",
   ]);
 
   return (
@@ -33,7 +33,7 @@ const Header: React.FC = () => {
     "justify-between",
     "flex-wrap",
     "bg-teal-500",
-    "p-6"
+    "p-6",
   ]);
 
   return (

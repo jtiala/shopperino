@@ -13,13 +13,13 @@ const Alert: React.FC<Props> = ({ variant, title, message }) => {
   const errorClasses = [
     "bg-orange-100",
     "border-orange-500",
-    "text-orange-700"
+    "text-orange-700",
   ];
 
   const warningClasses = [
     "bg-yellow-100",
     "border-yellow-500",
-    "text-yellow-700"
+    "text-yellow-700",
   ];
 
   const classes = classNames([
@@ -27,7 +27,7 @@ const Alert: React.FC<Props> = ({ variant, title, message }) => {
     "p-4",
     variant === "success" && successClasses,
     variant === "error" && errorClasses,
-    variant === "warning" && warningClasses
+    variant === "warning" && warningClasses,
   ]);
 
   return (

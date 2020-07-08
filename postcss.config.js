@@ -5,5 +5,5 @@ module.exports = {
     require("postcss-import"),
     tailwindcss("./tailwind.config.js"),
     require("autoprefixer"),
-  ]
+  ],
 };

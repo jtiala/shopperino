@@ -23,7 +23,7 @@ const AddItem: React.FC = () => {
         .add({
           title,
           uid: user.uid,
-          timestamp: new Date().getTime()
+          timestamp: new Date().getTime(),
         })
         .then(() => setTitle(""))
         .catch((err: string) => {
@@ -36,7 +36,7 @@ const AddItem: React.FC = () => {
     <form className={classes} onSubmit={handleSubmit}>
       <h3 className="text-teal-500 font-bold mb-2">Add item</h3>
       <Input
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
         value={title}
         placeholder="milk, butter, eggs..."
       />

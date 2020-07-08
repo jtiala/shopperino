@@ -20,7 +20,7 @@ const Input: React.FC<Props> = ({ value, placeholder, onChange }) => {
     "focus:outline-none",
     "focus:bg-white",
     "focus:border-teal-500",
-    "mb-2"
+    "mb-2",
   ]);
 
   return (

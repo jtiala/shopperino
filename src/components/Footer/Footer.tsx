@@ -17,7 +17,7 @@ const Footer: React.FC<Props> = ({ user }) => {
     "p-6",
     "mt-6",
     "text-sm",
-    "text-gray-600"
+    "text-gray-600",
   ]);
 
   const signOut = () => {
