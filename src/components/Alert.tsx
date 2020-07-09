@@ -1,6 +1,9 @@
 import React from "react";
 import classNames from "classnames";
 
+import Text from "./Text";
+import Stack from "./Stack";
+
 interface Props {
   variant?: "success" | "error" | "warning";
   title?: string;
@@ -32,8 +35,10 @@ const Alert: React.FC<Props> = ({ variant, title, message }) => {
 
   return (
     <div className={classes} role="alert">
-      {title && <p className="font-bold">{title}</p>}
-      {message && <p>{message}</p>}
+      <Stack>
+        {title && <Text as="strong">{title}</Text>}
+        {message && <Text>{message}</Text>}
+      </Stack>
     </div>
   );
 };

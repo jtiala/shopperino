@@ -1,23 +1,28 @@
 import React from "react";
 import classNames from "classnames";
 
-import { firestore } from "../../firebase";
+import { firestore } from "../firebase";
+import { ShoppingListItem } from "../interfaces/ShoppingListItem";
 
-import Alert from "../Alert/Alert";
+import Alert from "./Alert";
+import Stack from "./Stack";
+import Text from "./Text";
 
 interface Props {
-  id: string;
-  title: string;
+  item: ShoppingListItem;
 }
 
-const Item: React.FC<Props> = ({ id, title }) => {
+const Item: React.FC<Props> = ({ item }) => {
+  const [checked, setChecked] = React.useState(false);
   const [error, setError] = React.useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.checked) {
+      setChecked(true);
+
       firestore
         .collection("items")
-        .doc(id)
+        .doc(item.id)
         .delete()
         .catch((err: string) => {
           setError(err);
@@ -37,7 +42,8 @@ const Item: React.FC<Props> = ({ id, title }) => {
 
   const checkboxClasses = classNames([
     "mr-1",
-    "bg-white",
+    !checked && "bg-white",
+    checked && "bg-gray-400",
     "appearance-none",
     "border-2",
     "border-gray-500",
@@ -51,14 +57,16 @@ const Item: React.FC<Props> = ({ id, title }) => {
 
   return (
     <div className={classes}>
+      <Stack dir="row" gap={2} align="center">
+        <input
+          type="checkbox"
+          className={checkboxClasses}
+          onChange={handleChange}
+          checked={checked}
+        />
+        <Text>{item.title}</Text>
+      </Stack>
       {error.length > 0 && <Alert title="Error" message={error} />}
-
-      <input
-        type="checkbox"
-        className={checkboxClasses}
-        onChange={handleChange}
-      />
-      {title}
     </div>
   );
 };

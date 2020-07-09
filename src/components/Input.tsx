@@ -1,13 +1,14 @@
 import React from "react";
 import classNames from "classnames";
 
-interface Props {
-  value?: string;
-  placeholder?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+import Stack from "./Stack";
+import Text from "./Text";
+
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
 }
 
-const Input: React.FC<Props> = ({ value, placeholder, onChange }) => {
+const Input: React.FC<Props> = ({ label, ...props }) => {
   const classes = classNames([
     "bg-gray-100",
     "appearance-none",
@@ -20,17 +21,15 @@ const Input: React.FC<Props> = ({ value, placeholder, onChange }) => {
     "focus:outline-none",
     "focus:bg-white",
     "focus:border-teal-500",
-    "mb-2",
   ]);
 
   return (
-    <input
-      className={classes}
-      onChange={onChange}
-      value={value}
-      placeholder={placeholder}
-      type="text"
-    />
+    <label>
+      <Stack gap={1}>
+        <Text as="strong">{label}</Text>
+        <input className={classes} type="text" {...props} />
+      </Stack>
+    </label>
   );
 };
 
