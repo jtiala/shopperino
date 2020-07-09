@@ -13,9 +13,9 @@ jobs:
         run: npm install
       - name: Lint
         run: npm run lint
-      - name: Test
-        env:
-          CI: true
-        run: echo "TODO: Enable tests"
+      # - name: Test
+      #   env:
+      #     CI: true
+      #   run: npm run test
       - name: Build
         run: npm run build
