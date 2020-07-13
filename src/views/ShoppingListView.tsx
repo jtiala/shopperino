@@ -20,6 +20,8 @@ import ButtonLink from "../components/ButtonLink";
 import Divider from "../components/Divider";
 import Stack from "../components/Stack";
 import Button from "../components/Button";
+import Badge from "../components/Badge";
+import Text from "../components/Text";
 
 const DataWrapper: React.FC = () => {
   const { listId } = useParams();
@@ -29,16 +31,15 @@ const DataWrapper: React.FC = () => {
     shoppingList,
     shoppingListLoading,
     shoppingListError,
-  ] = useDocumentDataOnce<ShoppingList>(firestore.doc(`lists/${listId}`), {
-    idField: "id",
-  });
+  ] = useDocumentDataOnce<ShoppingList>(
+    firestore.doc(`shoppingLists/${listId}`),
+    {
+      idField: "id",
+    }
+  );
 
   const [items, itemsLoading, itemsError] = useCollectionData<ShoppingListItem>(
-    firestore
-      .collection("items")
-      .where("uid", "==", user?.uid)
-      .where("list", "==", firestore.collection("lists").doc(listId))
-      .orderBy("timestamp", "desc"),
+    firestore.doc(`shoppingLists/${listId}`).collection("items"),
     { idField: "id" }
   );
 
@@ -70,6 +71,8 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
     if (confirmed) {
       items.forEach((item) =>
         firestore
+          .collection("shoppingLists")
+          .doc(shoppingList.id)
           .collection("items")
           .doc(item.id)
           .delete()
@@ -79,7 +82,7 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
       );
 
       firestore
-        .collection("lists")
+        .collection("shoppingLists")
         .doc(shoppingList.id)
         .delete()
         .then((doc: any) => history.push("/"))
@@ -91,20 +94,31 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
 
   return (
     <Page title={shoppingList.title}>
+      {shoppingList.type === "collaborative" && (
+        <Badge>Collaborative shopping list</Badge>
+      )}
       <AddItem shoppingList={shoppingList} />
       {items.length < 1 ? (
         <Alert variant="warning" message="No items!" />
       ) : (
-        <ItemList items={items} />
+        <ItemList shoppingList={shoppingList} items={items} />
       )}
       <Divider />
-      <Stack dir="row" gap={2}>
-        <ButtonLink to={`/lists/${shoppingList.id}/edit`} size="small">
-          Edit shopping list details
-        </ButtonLink>
-        <Button onClick={() => deleteList()} size="small" variant="danger">
-          Delete shopping list
-        </Button>
+      <Stack>
+        <Stack dir="row" gap={2}>
+          <ButtonLink to={`/lists/${shoppingList.id}/edit`} size="small">
+            Edit shopping list details
+          </ButtonLink>
+          <Button onClick={() => deleteList()} size="small" variant="danger">
+            Delete shopping list
+          </Button>
+        </Stack>
+        {shoppingList.type === "collaborative" && (
+          <Stack gap={2}>
+            <Text>Invite collaborators using this link</Text>
+            <Text as="code">{`${window.location.origin}/invite/${shoppingList.id}/${shoppingList.collaborationKey}`}</Text>
+          </Stack>
+        )}
       </Stack>
       {error.length > 0 && <Alert title="Error" message={error} />}
     </Page>

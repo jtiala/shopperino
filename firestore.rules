@@ -1,25 +1,43 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /items/{item} {
-      allow read:
-        if request.auth.uid != null
-        && request.auth.uid == resource.data.uid;
+    match /shoppingLists/{shoppingList} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
 
-      allow write:
-        if request.auth.uid != null
-        && (request.auth.uid == resource.data.uid
-        || request.auth.uid == request.resource.data.uid);
-    }
-    match /lists/{list} {
-      allow read:
-        if request.auth.uid != null
-        && request.auth.uid == resource.data.uid;
+      function getRole(rsc) {
+        return rsc.data.roles[request.auth.uid];
+      }
 
-      allow write:
-        if request.auth.uid != null
-        && (request.auth.uid == resource.data.uid
-        || request.auth.uid == request.resource.data.uid);
+      function isOneOfRoles(rsc, array) {
+        return isSignedIn() && (getRole(rsc) in array);
+      }
+
+      // A new shopping list must contain the creator as owner
+      function isValidNewShoppingList() {
+        return request.resource.data.roles[request.auth.uid] == 'owner';
+      }
+
+      // Ensure type and roles are unchanged and that no new fields are added to the document.
+      function onlyContentChanged() {
+        return request.resource.data.type == resource.data.type
+          && request.resource.data.roles == resource.data.roles
+          && request.resource.data.keys() == resource.data.keys();
+      }
+
+      allow create: if isValidNewShoppingList();
+      allow delete: if isOneOfRoles(resource, ['owner']);
+      allow update: if isOneOfRoles(resource, ['owner'])
+        || (isOneOfRoles(resource, ['collaborator']) && onlyContentChanged());
+      allow read: if isOneOfRoles(resource, ['owner', 'collaborator']);
+
+      match /items/{item} {
+        allow read, write: if isOneOfRoles(
+          get(/databases/$(database)/documents/shoppingLists/$(shoppingList)),
+            ['owner', 'collaborator']);
+      }
     }
   }
 }

@@ -1,8 +1,9 @@
 import React from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useDocumentDataOnce } from "react-firebase-hooks/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
 
-import { firestore } from "../firebase";
+import { auth, firestore } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 
 import Page from "../components/Page";
@@ -20,9 +21,12 @@ const DataWrapper: React.FC = () => {
     shoppingList,
     shoppingListLoading,
     shoppingListError,
-  ] = useDocumentDataOnce<ShoppingList>(firestore.doc(`lists/${listId}`), {
-    idField: "id",
-  });
+  ] = useDocumentDataOnce<ShoppingList>(
+    firestore.doc(`shoppingLists/${listId}`),
+    {
+      idField: "id",
+    }
+  );
 
   if (shoppingListLoading) {
     return <LoadingPage />;
@@ -41,18 +45,27 @@ interface Props {
 
 const CreateShoppingListView: React.FC<Props> = ({ shoppingList }) => {
   const history = useHistory();
+  const [user] = useAuthState(auth);
 
-  const [title, setTitle] = React.useState(shoppingList.title || "");
+  const [title, setTitle] = React.useState(shoppingList.title);
   const [error, setError] = React.useState("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
+    if (!user) {
+      setError("Invalid user");
+
+      return;
+    }
+
     firestore
-      .collection("lists")
+      .collection("shoppingLists")
       .doc(shoppingList.id)
       .update({
         title,
+        updatedAt: new Date(),
+        updatedBy: user.uid,
       })
       .then(() => history.push(`/lists/${shoppingList.id}`))
       .catch((err: string) => {

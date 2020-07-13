@@ -1,7 +1,7 @@
 import React from "react";
 
 interface Props {
-  as?: "p" | "span" | "strong" | "small";
+  as?: "p" | "span" | "strong" | "small" | "code";
   children: React.ReactNode;
   className?: string;
 }

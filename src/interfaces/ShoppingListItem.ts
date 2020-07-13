@@ -1,7 +1,14 @@
-export interface ShoppingListItem {
-  id: string;
+export interface NewShoppingListItem {
   title: string;
-  timestamp: number;
-  uid: string;
-  listId: string;
+  status: ShoppingListItemStatus;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
 }
+
+export interface ShoppingListItem extends NewShoppingListItem {
+  id: string;
+}
+
+export type ShoppingListItemStatus = "active" | "inactive";

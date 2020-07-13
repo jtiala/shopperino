@@ -1,15 +1,17 @@
 import React from "react";
 import { animated, useTransition } from "react-spring";
 
+import { ShoppingList } from "../interfaces/ShoppingList";
 import { ShoppingListItem } from "../interfaces/ShoppingListItem";
 
 import Item from "./Item";
 
 interface Props {
+  shoppingList: ShoppingList;
   items: ShoppingListItem[];
 }
 
-const ItemList: React.FC<Props> = ({ items }) => {
+const ItemList: React.FC<Props> = ({ shoppingList, items }) => {
   const transition = useTransition(items, (item) => item.id, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
@@ -20,7 +22,7 @@ const ItemList: React.FC<Props> = ({ items }) => {
     <ul className="w-full">
       {transition.map(({ item, props, key }) => (
         <animated.li key={item.id} style={props}>
-          <Item item={item} />
+          <Item shoppingList={shoppingList} item={item} />
         </animated.li>
       ))}
     </ul>

@@ -3,6 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 
 import { auth, firestore } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
+import { NewShoppingListItem } from "../interfaces/ShoppingListItem";
 
 import Alert from "./Alert";
 import Button from "./Button";
@@ -21,15 +22,42 @@ const AddItem: React.FC<Props> = ({ shoppingList }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
+    if (!user) {
+      setError("Invalid user");
+
+      return;
+    }
+
+    const currentDate = new Date();
+
+    const newItem: NewShoppingListItem = {
+      title,
+      status: "active",
+      createdAt: currentDate,
+      createdBy: user.uid,
+      updatedAt: currentDate,
+      updatedBy: user.uid,
+    };
+
     firestore
+      .collection("shoppingLists")
+      .doc(shoppingList.id)
       .collection("items")
-      .add({
-        title,
-        uid: user?.uid,
-        list: firestore.collection("lists").doc(shoppingList.id),
-        timestamp: new Date().getTime(),
+      .add(newItem)
+      .then(() => {
+        setTitle("");
+
+        firestore
+          .collection("shoppingLists")
+          .doc(shoppingList.id)
+          .update({
+            updatedAt: currentDate,
+            updatedBy: user.uid,
+          })
+          .catch((err: string) => {
+            setError(err);
+          });
       })
-      .then(() => setTitle(""))
       .catch((err: string) => {
         setError(err);
       });

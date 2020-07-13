@@ -21,9 +21,8 @@ const DataWrapper: React.FC = () => {
     shoppingListsError,
   ] = useCollectionData<ShoppingList>(
     firestore
-      .collection("lists")
-      .where("uid", "==", user?.uid)
-      .orderBy("timestamp", "desc"),
+      .collection("shoppingLists")
+      .where(`roles.${user?.uid}`, "==", "owner"),
     { idField: "id" }
   );
 
