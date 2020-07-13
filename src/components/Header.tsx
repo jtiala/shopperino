@@ -11,7 +11,7 @@ import Button from "./Button";
 
 const Logo: React.FC = () => (
   <span role="img" aria-label="logo">
-    🛒
+    🛒✨
   </span>
 );
 
