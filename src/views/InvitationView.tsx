@@ -4,6 +4,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionDataOnce } from "react-firebase-hooks/firestore";
 
 import { auth, firestore } from "../firebase";
+import { ShoppingList } from "../interfaces/ShoppingList";
 import { SubscribedShoppingList } from "../interfaces/SubscribedShoppingList";
 
 import Page from "../components/Page";
@@ -17,6 +18,15 @@ const DataWrapper: React.FC = () => {
   const [user] = useAuthState(auth);
 
   const [
+    shoppingLists,
+    shoppingListsLoading,
+    shoppingListsError,
+  ] = useCollectionDataOnce<ShoppingList>(
+    firestore.collection("shoppingLists").where("createdBy", "==", user?.uid),
+    { idField: "id" }
+  );
+
+  const [
     subscribedShoppingLists,
     subscribedShoppingListsLoading,
     subscribedShoppingListsError,
@@ -28,22 +38,43 @@ const DataWrapper: React.FC = () => {
     { idField: "id" }
   );
 
-  if (subscribedShoppingListsLoading) {
+  if (shoppingListsLoading || subscribedShoppingListsLoading) {
     return <LoadingPage />;
   }
 
-  if (!user || !subscribedShoppingLists || subscribedShoppingListsError) {
-    return <ErrorPage message={subscribedShoppingListsError?.message} />;
+  if (
+    !user ||
+    !shoppingLists ||
+    !subscribedShoppingLists ||
+    shoppingListsError ||
+    subscribedShoppingListsError
+  ) {
+    return (
+      <ErrorPage
+        message={
+          shoppingListsError?.message || subscribedShoppingListsError?.message
+        }
+      />
+    );
   }
 
-  return <InvitationView subscribedShoppingLists={subscribedShoppingLists} />;
+  return (
+    <InvitationView
+      shoppingLists={shoppingLists}
+      subscribedShoppingLists={subscribedShoppingLists}
+    />
+  );
 };
 
 interface Props {
+  shoppingLists: ShoppingList[];
   subscribedShoppingLists: SubscribedShoppingList[];
 }
 
-const InvitationView: React.FC<Props> = ({ subscribedShoppingLists }) => {
+const InvitationView: React.FC<Props> = ({
+  shoppingLists,
+  subscribedShoppingLists,
+}) => {
   const { listId, invitationKey } = useParams();
   const history = useHistory();
   const [error, setError] = useState<Error>();
@@ -80,12 +111,19 @@ const InvitationView: React.FC<Props> = ({ subscribedShoppingLists }) => {
       .catch((error: Error) => setError(error));
   };
 
-  const foundList = subscribedShoppingLists.find((list) => list.id === listId);
+  const isOwnList =
+    shoppingLists.find((list) => list.id === listId) !== undefined;
+  const hasAlreadySubscribed =
+    subscribedShoppingLists.find((list) => list.id === listId) !== undefined;
 
   return (
     <Page title="Collaboration invitation">
       <Text>You have been invited to collaborate on a shopping list.</Text>
-      {foundList ? (
+      {isOwnList ? (
+        <Alert variant="success" title="This shopping lists is made by you">
+          {<Link to={`/lists/${listId}`}>Check it out!</Link>}
+        </Alert>
+      ) : hasAlreadySubscribed ? (
         <Alert
           variant="success"
           title="You have already subscribed to the list"
