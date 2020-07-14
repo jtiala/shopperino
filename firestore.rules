@@ -43,16 +43,21 @@ service cloud.firestore {
       allow delete: if ownsResource(resource);
       allow update: if ownsResource(resource)
         || (
-          isSignedIn() 
+          isSignedIn()
+          && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList))
           && isCollaborative(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
           && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList)/collaborators/$(request.auth.uid))
           && updatesOnlyAllowedFields(resource, request.resource)
         );
       allow read: if ownsResource(resource)
         || (
-          isSignedIn() 
+          isSignedIn()
+          && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList))
           && isCollaborative(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
           && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList)/collaborators/$(request.auth.uid))
+        ) || (
+          isSignedIn()
+          && !exists(/databases/$(database)/documents/shoppingLists/$(shoppingList))
         );
 
       match /items/{item} {
@@ -73,6 +78,7 @@ service cloud.firestore {
         allow create: if isSignedIn()
           && ! ownsResource(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
           && collaborator == request.auth.uid
+          && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList))
           && isCollaborative(
             get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
           && invitationKeyMatches(
