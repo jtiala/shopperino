@@ -3,7 +3,7 @@ import cuid from "cuid";
 import { useHistory } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { auth, firestore } from "../firebase";
+import { auth, firestore, Timestamp } from "../firebase";
 import { NewShoppingList, ShoppingListType } from "../interfaces/ShoppingList";
 
 import Page from "../components/Page";
@@ -20,24 +20,23 @@ const CreateShoppingListView: React.FC = () => {
     `Shopping list for ${new Date().toLocaleDateString("fi-FI")}`
   );
   const [type, setType] = React.useState<ShoppingListType>("private");
-  const [error, setError] = React.useState("");
+  const [error, setError] = React.useState<Error>();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
     if (!user) {
-      setError("Invalid user");
+      setError(new Error("Invalid user"));
 
       return;
     }
 
-    const currentDate = new Date();
+    const currentDate = Timestamp.fromDate(new Date());
 
     const newShoppingList: NewShoppingList = {
       title,
       type,
-      collaborationKey: type === "collaborative" ? cuid() : null,
-      roles: { [user.uid]: "owner" },
+      invitationKey: type === "collaborative" ? cuid() : null,
       createdAt: currentDate,
       createdBy: user.uid,
       updatedAt: currentDate,
@@ -48,9 +47,7 @@ const CreateShoppingListView: React.FC = () => {
       .collection("shoppingLists")
       .add(newShoppingList)
       .then((shoppingList: any) => history.push(`/lists/${shoppingList.id}`))
-      .catch((err: string) => {
-        setError(err);
-      });
+      .catch((error: Error) => setError(error));
   };
 
   return (
@@ -76,7 +73,11 @@ const CreateShoppingListView: React.FC = () => {
           <Button type="submit" variant="primary" disabled={title.length < 1}>
             Create
           </Button>
-          {error.length > 0 && <Alert title="Error" message={error} />}
+          {error && (
+            <Alert variant="error" title="Error">
+              {error.message}
+            </Alert>
+          )}
         </Stack>
       </form>
     </Page>

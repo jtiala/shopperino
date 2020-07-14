@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from "classnames";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import { auth } from "../firebase";
@@ -39,9 +39,10 @@ const Title: React.FC = () => {
 
 const Header: React.FC = () => {
   const [user] = useAuthState(auth);
+  const history = useHistory();
 
   const signOut = () => {
-    auth.signOut();
+    history.push("/sign-out");
   };
 
   return (

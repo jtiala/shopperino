@@ -62,13 +62,23 @@ interface Props {
 }
 
 const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
+  const [user] = useAuthState(auth);
   const history = useHistory();
-  const [error, setError] = useState("");
+  const [error, setError] = useState<Error>();
+  const [loading, setLoading] = useState(false);
+  const isCollaborativeList = shoppingList.type === "collaborative";
+  const isOwnList = shoppingList.createdBy === user?.uid;
+
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   const deleteList = () => {
     const confirmed = window.confirm("Are you sure?");
 
     if (confirmed) {
+      setLoading(true);
+
       items.forEach((item) =>
         firestore
           .collection("shoppingLists")
@@ -76,8 +86,9 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
           .collection("items")
           .doc(item.id)
           .delete()
-          .catch((err: string) => {
-            setError(err);
+          .catch((error: Error) => {
+            setError(error);
+            setLoading(false);
           })
       );
 
@@ -86,8 +97,47 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
         .doc(shoppingList.id)
         .delete()
         .then((doc: any) => history.push("/"))
-        .catch((err: string) => {
-          setError(err);
+        .catch((error: Error) => {
+          setError(error);
+          setLoading(false);
+        });
+    }
+  };
+
+  const unsubscribeList = () => {
+    const confirmed = window.confirm("Are you sure?");
+
+    if (!user) {
+      setError(new Error("Invalid user"));
+
+      return;
+    }
+
+    if (confirmed) {
+      setLoading(true);
+
+      firestore
+        .collection("users")
+        .doc(user.uid)
+        .collection("subscribedShoppingLists")
+        .doc(shoppingList.id)
+        .delete()
+        .then(() => {
+          firestore
+            .collection("shoppingLists")
+            .doc(shoppingList.id)
+            .collection("collaborators")
+            .doc(user.uid)
+            .delete()
+            .then(() => history.push("/"))
+            .catch((error: Error) => {
+              setError(error);
+              setLoading(false);
+            });
+        })
+        .catch((error: Error) => {
+          setError(error);
+          setLoading(false);
         });
     }
   };
@@ -95,32 +145,56 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
   return (
     <Page title={shoppingList.title}>
       {shoppingList.type === "collaborative" && (
-        <Badge>Collaborative shopping list</Badge>
+        <Badge variant="primary">Collaborative shopping list</Badge>
       )}
       <AddItem shoppingList={shoppingList} />
       {items.length < 1 ? (
-        <Alert variant="warning" message="No items!" />
+        <Alert variant="warning" title="No items!" />
       ) : (
         <ItemList shoppingList={shoppingList} items={items} />
       )}
       <Divider />
       <Stack>
         <Stack dir="row" gap={2}>
-          <ButtonLink to={`/lists/${shoppingList.id}/edit`} size="small">
-            Edit shopping list details
-          </ButtonLink>
-          <Button onClick={() => deleteList()} size="small" variant="danger">
-            Delete shopping list
-          </Button>
+          {isOwnList ? (
+            <>
+              <ButtonLink to={`/lists/${shoppingList.id}/edit`} size="small">
+                Edit shopping list details
+              </ButtonLink>
+              <Button
+                onClick={() => deleteList()}
+                size="small"
+                variant="danger"
+              >
+                Delete shopping list
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={() => unsubscribeList()}
+              size="small"
+              variant="danger"
+            >
+              Unsubscribe
+            </Button>
+          )}
         </Stack>
-        {shoppingList.type === "collaborative" && (
+
+        {isCollaborativeList && (
           <Stack gap={2}>
             <Text>Invite collaborators using this link</Text>
-            <Text as="code">{`${window.location.origin}/invite/${shoppingList.id}/${shoppingList.collaborationKey}`}</Text>
+            <Text
+              as="code"
+              className="p-2 border border-gray-200 bg-gray-100"
+            >{`${window.location.origin}/invite/${shoppingList.id}/${shoppingList.invitationKey}`}</Text>
           </Stack>
         )}
       </Stack>
-      {error.length > 0 && <Alert title="Error" message={error} />}
+      {error && (
+        <Alert variant="error" title="Error">
+          {error.message}
+        </Alert>
+      )}
     </Page>
   );
 };

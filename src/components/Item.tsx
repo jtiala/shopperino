@@ -18,12 +18,12 @@ interface Props {
 const Item: React.FC<Props> = ({ shoppingList, item }) => {
   const [user] = useAuthState(auth);
   const [checked, setChecked] = React.useState(false);
-  const [error, setError] = React.useState("");
+  const [error, setError] = React.useState<Error>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.checked) {
       if (!user) {
-        setError("Invalid user");
+        setError(new Error("Invalid user"));
 
         return;
       }
@@ -44,13 +44,9 @@ const Item: React.FC<Props> = ({ shoppingList, item }) => {
               updatedAt: new Date(),
               updatedBy: user.uid,
             })
-            .catch((err: string) => {
-              setError(err);
-            });
+            .catch((error: Error) => setError(error));
         })
-        .catch((err: string) => {
-          setError(err);
-        });
+        .catch((error: Error) => setError(error));
     }
   };
 
@@ -90,7 +86,11 @@ const Item: React.FC<Props> = ({ shoppingList, item }) => {
         />
         <Text>{item.title}</Text>
       </Stack>
-      {error.length > 0 && <Alert title="Error" message={error} />}
+      {error && (
+        <Alert variant="error" title="Error">
+          {error.message}
+        </Alert>
+      )}
     </div>
   );
 };

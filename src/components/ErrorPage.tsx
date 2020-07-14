@@ -9,7 +9,9 @@ interface Props {
 
 const LoadingPage: React.FC<Props> = ({ message }) => (
   <Page title="Oh no!">
-    <Alert title="An error occured :(" message={message} />
+    <Alert variant="error" title="An error occured :(">
+      {message}
+    </Alert>
   </Page>
 );
 

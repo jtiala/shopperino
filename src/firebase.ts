@@ -18,10 +18,20 @@ firebase.initializeApp(config);
 
 const firestore = firebase.firestore();
 firebase.firestore().enablePersistence();
+const FieldPath = firebase.firestore.FieldPath;
+const Timestamp = firebase.firestore.Timestamp;
 
 const auth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 const analytics = firebase.analytics();
 
-export { firebase, firestore, auth, googleProvider, analytics };
+export {
+  firebase,
+  firestore,
+  FieldPath,
+  Timestamp,
+  auth,
+  googleProvider,
+  analytics,
+};

@@ -48,13 +48,13 @@ const CreateShoppingListView: React.FC<Props> = ({ shoppingList }) => {
   const [user] = useAuthState(auth);
 
   const [title, setTitle] = React.useState(shoppingList.title);
-  const [error, setError] = React.useState("");
+  const [error, setError] = React.useState<Error>();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
     if (!user) {
-      setError("Invalid user");
+      setError(new Error("Invalid user"));
 
       return;
     }
@@ -68,9 +68,7 @@ const CreateShoppingListView: React.FC<Props> = ({ shoppingList }) => {
         updatedBy: user.uid,
       })
       .then(() => history.push(`/lists/${shoppingList.id}`))
-      .catch((err: string) => {
-        setError(err);
-      });
+      .catch((error: Error) => setError(error));
   };
 
   return (
@@ -85,7 +83,11 @@ const CreateShoppingListView: React.FC<Props> = ({ shoppingList }) => {
           <Button type="submit" variant="primary" disabled={title.length < 1}>
             Save
           </Button>
-          {error.length > 0 && <Alert title="Error" message={error} />}
+          {error && (
+            <Alert variant="error" title="Error">
+              {error.message}
+            </Alert>
+          )}
         </Stack>
       </form>
     </Page>

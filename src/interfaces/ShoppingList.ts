@@ -1,13 +1,10 @@
 export interface NewShoppingList {
   title: string;
   type: ShoppingListType;
-  collaborationKey: string | null;
-  roles: {
-    [uid: string]: ShoppingListRole;
-  };
-  createdAt: Date;
+  invitationKey: string | null;
+  createdAt: firebase.firestore.Timestamp;
   createdBy: string;
-  updatedAt: Date;
+  updatedAt: firebase.firestore.Timestamp;
   updatedBy: string;
 }
 
@@ -16,5 +13,3 @@ export interface ShoppingList extends NewShoppingList {
 }
 
 export type ShoppingListType = "private" | "collaborative";
-
-export type ShoppingListRole = "owner" | "collaborator";

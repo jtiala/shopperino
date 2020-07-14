@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { auth, firestore } from "../firebase";
+import { auth, firestore, Timestamp } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 import { NewShoppingListItem } from "../interfaces/ShoppingListItem";
 
@@ -17,18 +17,18 @@ interface Props {
 const AddItem: React.FC<Props> = ({ shoppingList }) => {
   const [user] = useAuthState(auth);
   const [title, setTitle] = React.useState("");
-  const [error, setError] = React.useState("");
+  const [error, setError] = React.useState<Error>();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
     if (!user) {
-      setError("Invalid user");
+      setError(new Error("Invalid user"));
 
       return;
     }
 
-    const currentDate = new Date();
+    const currentDate = Timestamp.fromDate(new Date());
 
     const newItem: NewShoppingListItem = {
       title,
@@ -54,13 +54,9 @@ const AddItem: React.FC<Props> = ({ shoppingList }) => {
             updatedAt: currentDate,
             updatedBy: user.uid,
           })
-          .catch((err: string) => {
-            setError(err);
-          });
+          .catch((error: Error) => setError(error));
       })
-      .catch((err: string) => {
-        setError(err);
-      });
+      .catch((error: Error) => setError(error));
   };
 
   return (
@@ -76,7 +72,11 @@ const AddItem: React.FC<Props> = ({ shoppingList }) => {
           Add
         </Button>
       </Stack>
-      {error.length > 0 && <Alert title="Error" message={error} />}
+      {error && (
+        <Alert variant="error" title="Error">
+          {error.message}
+        </Alert>
+      )}
     </form>
   );
 };

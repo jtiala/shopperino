@@ -1,9 +1,9 @@
 export interface NewShoppingListItem {
   title: string;
   status: ShoppingListItemStatus;
-  createdAt: Date;
+  createdAt: firebase.firestore.Timestamp;
   createdBy: string;
-  updatedAt: Date;
+  updatedAt: firebase.firestore.Timestamp;
   updatedBy: string;
 }
 

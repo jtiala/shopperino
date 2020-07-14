@@ -12,6 +12,10 @@ interface Props {
 }
 
 const ItemList: React.FC<Props> = ({ shoppingList, items }) => {
+  items.sort((a, b) =>
+    a.createdAt.toMillis() > b.createdAt.toMillis() ? -1 : 1
+  );
+
   const transition = useTransition(items, (item) => item.id, {
     from: { opacity: 0 },
     enter: { opacity: 1 },

@@ -7,10 +7,10 @@ import Stack from "./Stack";
 interface Props {
   variant?: "success" | "error" | "warning";
   title?: string;
-  message?: string;
+  children?: React.ReactNode;
 }
 
-const Alert: React.FC<Props> = ({ variant, title, message }) => {
+const Alert: React.FC<Props> = ({ variant, title, children }) => {
   const successClasses = ["bg-green-100", "border-green-500", "text-green-700"];
 
   const errorClasses = [
@@ -37,7 +37,7 @@ const Alert: React.FC<Props> = ({ variant, title, message }) => {
     <div className={classes} role="alert">
       <Stack>
         {title && <Text as="strong">{title}</Text>}
-        {message && <Text>{message}</Text>}
+        {children}
       </Stack>
     </div>
   );

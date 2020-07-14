@@ -6,7 +6,9 @@ import ShoppingListView from "./ShoppingListView";
 import ShoppingListsView from "./ShoppingListsView";
 import CreateShoppingListView from "./CreateShoppingListView";
 import EditShoppingListView from "./EditShoppingListView";
+import InvitationView from "./InvitationView";
 import SignInView from "./SignInView";
+import SignOutView from "./SignOutView";
 
 const App: React.FC = () => {
   return (
@@ -32,8 +34,16 @@ const App: React.FC = () => {
             <EditShoppingListView />
           </AuthenticationWrapper>
         </Route>
+        <Route path="/invite/:listId/:invitationKey" exact>
+          <AuthenticationWrapper>
+            <InvitationView />
+          </AuthenticationWrapper>
+        </Route>
         <Route path="/sign-in">
           <SignInView />
+        </Route>
+        <Route path="/sign-out">
+          <SignOutView />
         </Route>
       </Switch>
     </Router>

@@ -1,42 +1,86 @@
 rules_version = '2';
 
+function isSignedIn() {
+  return request.auth != null;
+}
+
+function ownsResource(rsc) {
+  return isSignedIn() && rsc.data.createdBy == request.auth.uid;
+}
+
+function isCollaborative(rsc) {
+  return rsc.data.type == "collaborative";
+}
+
+function invitationKeyMatches(rsc, invitationKey) {
+  return rsc.data.invitationKey == invitationKey;
+}
+
+// Allows editing of title, updatedAt and updatedBy
+function updatesOnlyAllowedFields(old, new) {
+  return old.data.type == new.data.type
+    && old.data.invitationKey == new.data.invitationKey
+    && old.data.createdAt == new.data.createdAt
+    && old.data.createdBy == new.data.createdBy;
+}
+
+
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /users/{user} {
+      allow create: if isSignedIn() 
+        && user == request.auth.uid;
+      allow read, update: if isSignedIn() 
+        && user == request.auth.uid;
+        
+      match /subscribedShoppingLists/{doc} {
+        allow read, write: if isSignedIn() && user == request.auth.uid;
+      }
+    }
+    
     match /shoppingLists/{shoppingList} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function getRole(rsc) {
-        return rsc.data.roles[request.auth.uid];
-      }
-
-      function isOneOfRoles(rsc, array) {
-        return isSignedIn() && (getRole(rsc) in array);
-      }
-
-      // A new shopping list must contain the creator as owner
-      function isValidNewShoppingList() {
-        return request.resource.data.roles[request.auth.uid] == 'owner';
-      }
-
-      // Ensure type and roles are unchanged and that no new fields are added to the document.
-      function onlyContentChanged() {
-        return request.resource.data.type == resource.data.type
-          && request.resource.data.roles == resource.data.roles
-          && request.resource.data.keys() == resource.data.keys();
-      }
-
-      allow create: if isValidNewShoppingList();
-      allow delete: if isOneOfRoles(resource, ['owner']);
-      allow update: if isOneOfRoles(resource, ['owner'])
-        || (isOneOfRoles(resource, ['collaborator']) && onlyContentChanged());
-      allow read: if isOneOfRoles(resource, ['owner', 'collaborator']);
+      allow create: if ownsResource(request.resource);
+      allow delete: if ownsResource(resource);
+      allow update: if ownsResource(resource)
+        || (
+          isSignedIn() 
+          && isCollaborative(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+          && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList)/collaborators/$(request.auth.uid))
+          && updatesOnlyAllowedFields(resource, request.resource)
+        );
+      allow read: if ownsResource(resource)
+        || (
+          isSignedIn() 
+          && isCollaborative(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+          && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList)/collaborators/$(request.auth.uid))
+        );
 
       match /items/{item} {
-        allow read, write: if isOneOfRoles(
-          get(/databases/$(database)/documents/shoppingLists/$(shoppingList)),
-            ['owner', 'collaborator']);
+        allow read, write: if ownsResource(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+         || (
+          isSignedIn() 
+          && isCollaborative(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+          && exists(/databases/$(database)/documents/shoppingLists/$(shoppingList)/collaborators/$(request.auth.uid))
+        );
+      }
+      
+      match /collaborators/{collaborator} {
+        allow read: if ownsResource(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+          || (
+            isSignedIn() && resource.id == request.auth.uid
+          );
+        
+        allow create: if isSignedIn()
+          && ! ownsResource(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+          && collaborator == request.auth.uid
+          && isCollaborative(
+            get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+          && invitationKeyMatches(
+            get(/databases/$(database)/documents/shoppingLists/$(shoppingList)),
+            request.resource.data.invitationKey);
+            
+        allow delete: if ownsResource(get(/databases/$(database)/documents/shoppingLists/$(shoppingList)))
+          || collaborator == request.auth.uid;
       }
     }
   }

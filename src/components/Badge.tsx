@@ -3,20 +3,16 @@ import classNames from "classnames";
 import Text from "./Text";
 
 interface Props {
+  variant?: "default" | "primary";
   children: React.ReactNode;
 }
 
-const Badge: React.FC<Props> = ({ children }) => {
-  const className = classNames([
-    "inline-flex",
-    "py-1",
-    "px-2",
-    "rounded",
-    "bg-teal-500",
-    "text-white",
-    "text-xs",
-    "uppercase",
-  ]);
+const Badge: React.FC<Props> = ({ variant = "default", children }) => {
+  const className = classNames(
+    ["inline-flex", "py-1", "px-2", "rounded", "text-xs", "uppercase"],
+    variant === "default" && ["text-white", "bg-gray-600"],
+    variant === "primary" && ["text-white", "bg-teal-500"]
+  );
 
   return (
     <div className={className}>
