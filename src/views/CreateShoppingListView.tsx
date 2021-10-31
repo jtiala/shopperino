@@ -3,7 +3,7 @@ import cuid from "cuid";
 import { useHistory } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { auth, firestore, Timestamp } from "../firebase";
+import { auth, firestoreCompat, Timestamp } from "../firebase";
 import { NewShoppingList, ShoppingListType } from "../interfaces/ShoppingList";
 
 import Page from "../components/Page";
@@ -43,7 +43,7 @@ const CreateShoppingListView: React.FC = () => {
       updatedBy: user.uid,
     };
 
-    firestore
+    firestoreCompat
       .collection("shoppingLists")
       .add(newShoppingList)
       .then((shoppingList: any) => history.push(`/lists/${shoppingList.id}`))

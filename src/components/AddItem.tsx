@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { auth, firestore, Timestamp } from "../firebase";
+import { auth, firestoreCompat, Timestamp } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 import { NewShoppingListItem } from "../interfaces/ShoppingListItem";
 
@@ -39,7 +39,7 @@ const AddItem: React.FC<Props> = ({ shoppingList }) => {
       updatedBy: user.uid,
     };
 
-    firestore
+    firestoreCompat
       .collection("shoppingLists")
       .doc(shoppingList.id)
       .collection("items")
@@ -47,7 +47,7 @@ const AddItem: React.FC<Props> = ({ shoppingList }) => {
       .then(() => {
         setTitle("");
 
-        firestore
+        firestoreCompat
           .collection("shoppingLists")
           .doc(shoppingList.id)
           .update({

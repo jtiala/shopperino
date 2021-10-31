@@ -5,12 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
         with:
-          version: 12.x
+          version: 16.x
       - name: Install
-        run: npm install
+        run: npm ci
       - name: Lint
         run: npm run lint
       # - name: Test

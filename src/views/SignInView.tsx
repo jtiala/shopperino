@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { signInWithPopup, UserCredential } from "firebase/auth";
 
-import { auth, googleProvider, firestore } from "../firebase";
+import { auth, googleProvider, firestoreCompat } from "../firebase";
 
 import Page from "../components/Page";
 import Button from "../components/Button";
@@ -21,8 +22,7 @@ const SignInView: React.FC = () => {
   const signInWithGoogle = () => {
     setLoading(true);
 
-    auth
-      .signInWithPopup(googleProvider)
+    signInWithPopup(auth, googleProvider)
       .then((userCredential) =>
         createUserIfNotExists(userCredential)
           .then(() => history.push("/"))
@@ -34,11 +34,9 @@ const SignInView: React.FC = () => {
       });
   };
 
-  const createUserIfNotExists = (
-    userCredential: firebase.auth.UserCredential
-  ) => {
-    return new Promise((resolve, reject) => {
-      const usersRef = firestore
+  const createUserIfNotExists = (userCredential: UserCredential) => {
+    return new Promise<void>((resolve, reject) => {
+      const usersRef = firestoreCompat
         .collection("users")
         .doc(userCredential.user?.uid);
 

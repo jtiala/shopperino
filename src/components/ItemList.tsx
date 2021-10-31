@@ -16,7 +16,8 @@ const ItemList: React.FC<Props> = ({ shoppingList, items }) => {
     a.createdAt.toMillis() > b.createdAt.toMillis() ? -1 : 1
   );
 
-  const transition = useTransition(items, (item) => item.id, {
+  const transitions = useTransition(items, {
+    keys: (item) => item.id,
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
@@ -24,8 +25,8 @@ const ItemList: React.FC<Props> = ({ shoppingList, items }) => {
 
   return (
     <ul className="w-full">
-      {transition.map(({ item, props, key }) => (
-        <animated.li key={item.id} style={props}>
+      {transitions((style, item) => (
+        <animated.li key={item.id} style={style}>
           <Item shoppingList={shoppingList} item={item} />
         </animated.li>
       ))}
