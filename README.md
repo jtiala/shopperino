@@ -56,4 +56,4 @@ This project is open source software licensed under the MIT license. For more in
 [firebase]: https://firebase.google.com/
 [firebase-console]: https://console.firebase.google.com/
 [firebase-setup]: https://firebase.google.com/docs/web/setup
-[shopperino]: https://shopperino-app.web.app/sign-in
+[shopperino]: https://shopperino-app.web.app
