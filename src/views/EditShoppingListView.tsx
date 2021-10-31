@@ -2,8 +2,9 @@ import React from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useDocumentDataOnce } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { DocumentReference } from "firebase/firestore";
 
-import { auth, firestore } from "../firebase";
+import { auth, firestoreCompat } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 
 import Page from "../components/Page";
@@ -15,18 +16,17 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 
 const DataWrapper: React.FC = () => {
-  const { listId } = useParams();
+  const { listId } = useParams<{ listId: string }>();
 
-  const [
-    shoppingList,
-    shoppingListLoading,
-    shoppingListError,
-  ] = useDocumentDataOnce<ShoppingList>(
-    firestore.doc(`shoppingLists/${listId}`),
-    {
-      idField: "id",
-    }
-  );
+  const [shoppingList, shoppingListLoading, shoppingListError] =
+    useDocumentDataOnce<ShoppingList>(
+      firestoreCompat.doc(
+        `shoppingLists/${listId}`
+      ) as unknown as DocumentReference<ShoppingList>,
+      {
+        idField: "id",
+      }
+    );
 
   if (shoppingListLoading) {
     return <LoadingPage />;
@@ -59,7 +59,7 @@ const CreateShoppingListView: React.FC<Props> = ({ shoppingList }) => {
       return;
     }
 
-    firestore
+    firestoreCompat
       .collection("shoppingLists")
       .doc(shoppingList.id)
       .update({

@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useParams, useHistory, Link } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionDataOnce } from "react-firebase-hooks/firestore";
+import { Query } from "firebase/firestore";
 
-import { auth, firestore } from "../firebase";
+import { auth, firestoreCompat } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 import { SubscribedShoppingList } from "../interfaces/SubscribedShoppingList";
 
@@ -17,24 +18,23 @@ import ErrorPage from "../components/ErrorPage";
 const DataWrapper: React.FC = () => {
   const [user] = useAuthState(auth);
 
-  const [
-    shoppingLists,
-    shoppingListsLoading,
-    shoppingListsError,
-  ] = useCollectionDataOnce<ShoppingList>(
-    firestore.collection("shoppingLists").where("createdBy", "==", user?.uid),
-    { idField: "id" }
-  );
+  const [shoppingLists, shoppingListsLoading, shoppingListsError] =
+    useCollectionDataOnce<ShoppingList>(
+      firestoreCompat
+        .collection("shoppingLists")
+        .where("createdBy", "==", user?.uid) as unknown as Query<ShoppingList>,
+      { idField: "id" }
+    );
 
   const [
     subscribedShoppingLists,
     subscribedShoppingListsLoading,
     subscribedShoppingListsError,
   ] = useCollectionDataOnce<SubscribedShoppingList>(
-    firestore
+    firestoreCompat
       .collection("users")
       .doc(user?.uid)
-      .collection("subscribedShoppingLists"),
+      .collection("subscribedShoppingLists") as unknown as Query<ShoppingList>,
     { idField: "id" }
   );
 
@@ -75,7 +75,8 @@ const InvitationView: React.FC<Props> = ({
   shoppingLists,
   subscribedShoppingLists,
 }) => {
-  const { listId, invitationKey } = useParams();
+  const { listId, invitationKey } =
+    useParams<{ listId: string; invitationKey: string }>();
   const history = useHistory();
   const [error, setError] = useState<Error>();
   const [user] = useAuthState(auth);
@@ -87,7 +88,7 @@ const InvitationView: React.FC<Props> = ({
       return;
     }
 
-    firestore
+    firestoreCompat
       .collection("shoppingLists")
       .doc(listId)
       .collection("collaborators")
@@ -97,13 +98,15 @@ const InvitationView: React.FC<Props> = ({
         acceptedAt: new Date(),
       })
       .then(() => {
-        firestore
+        firestoreCompat
           .collection("users")
           .doc(user.uid)
           .collection("subscribedShoppingLists")
           .doc(listId)
           .set({
-            shoppingList: firestore.collection("shoppingLists").doc(listId),
+            shoppingList: firestoreCompat
+              .collection("shoppingLists")
+              .doc(listId),
           })
           .then(() => history.push(`/lists/${listId}`))
           .catch((error: Error) => setError(error));
