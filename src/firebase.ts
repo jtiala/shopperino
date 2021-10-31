@@ -1,7 +1,14 @@
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/firestore";
-import "firebase/analytics";
+import { initializeApp } from "firebase/app";
+import firebase from "firebase/compat/app";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import "firebase/compat/firestore";
+import {
+  // getFirestore,
+  // enableIndexedDbPersistence,
+  FieldPath,
+  Timestamp,
+} from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -14,21 +21,23 @@ const config = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
-firebase.initializeApp(config);
+const firebaseApp = initializeApp(config);
+firebase.initializeApp(config); // firestoreCompat
 
-const firestore = firebase.firestore();
+const firestoreCompat = firebase.firestore();
 firebase.firestore().enablePersistence();
-const FieldPath = firebase.firestore.FieldPath;
-const Timestamp = firebase.firestore.Timestamp;
 
-const auth = firebase.auth();
-const googleProvider = new firebase.auth.GoogleAuthProvider();
+// TODO: replace firestoreCompat with these
+// const firestore = getFirestore(firebaseApp);
+// enableIndexedDbPersistence(firestore);
 
-const analytics = firebase.analytics();
+const auth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
+const analytics = getAnalytics(firebaseApp);
 
 export {
-  firebase,
-  firestore,
+  firestoreCompat,
   FieldPath,
   Timestamp,
   auth,

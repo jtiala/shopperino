@@ -5,8 +5,9 @@ import {
   useCollectionData,
 } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { DocumentReference, CollectionReference } from "firebase/firestore";
 
-import { auth, firestore } from "../firebase";
+import { auth, firestoreCompat } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 import { ShoppingListItem } from "../interfaces/ShoppingListItem";
 
@@ -24,22 +25,23 @@ import Badge from "../components/Badge";
 import Text from "../components/Text";
 
 const DataWrapper: React.FC = () => {
-  const { listId } = useParams();
+  const { listId } = useParams<{ listId: string }>();
   const [user] = useAuthState(auth);
 
-  const [
-    shoppingList,
-    shoppingListLoading,
-    shoppingListError,
-  ] = useDocumentDataOnce<ShoppingList>(
-    firestore.doc(`shoppingLists/${listId}`),
-    {
-      idField: "id",
-    }
-  );
+  const [shoppingList, shoppingListLoading, shoppingListError] =
+    useDocumentDataOnce<ShoppingList>(
+      firestoreCompat.doc(
+        `shoppingLists/${listId}`
+      ) as unknown as DocumentReference<ShoppingList>,
+      {
+        idField: "id",
+      }
+    );
 
   const [items, itemsLoading, itemsError] = useCollectionData<ShoppingListItem>(
-    firestore.doc(`shoppingLists/${listId}`).collection("items"),
+    firestoreCompat
+      .doc(`shoppingLists/${listId}`)
+      .collection("items") as unknown as CollectionReference<ShoppingListItem>,
     { idField: "id" }
   );
 
@@ -80,7 +82,7 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
       setLoading(true);
 
       items.forEach((item) =>
-        firestore
+        firestoreCompat
           .collection("shoppingLists")
           .doc(shoppingList.id)
           .collection("items")
@@ -92,7 +94,7 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
           })
       );
 
-      firestore
+      firestoreCompat
         .collection("shoppingLists")
         .doc(shoppingList.id)
         .delete()
@@ -116,14 +118,14 @@ const ShoppingListView: React.FC<Props> = ({ shoppingList, items }) => {
     if (confirmed) {
       setLoading(true);
 
-      firestore
+      firestoreCompat
         .collection("users")
         .doc(user.uid)
         .collection("subscribedShoppingLists")
         .doc(shoppingList.id)
         .delete()
         .then(() => {
-          firestore
+          firestoreCompat
             .collection("shoppingLists")
             .doc(shoppingList.id)
             .collection("collaborators")

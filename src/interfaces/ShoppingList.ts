@@ -1,10 +1,12 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface NewShoppingList {
   title: string;
   type: ShoppingListType;
   invitationKey: string | null;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
   createdBy: string;
-  updatedAt: firebase.firestore.Timestamp;
+  updatedAt: Timestamp;
   updatedBy: string;
 }
 

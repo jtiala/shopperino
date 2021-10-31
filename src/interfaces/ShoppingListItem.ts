@@ -1,9 +1,11 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface NewShoppingListItem {
   title: string;
   status: ShoppingListItemStatus;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
   createdBy: string;
-  updatedAt: firebase.firestore.Timestamp;
+  updatedAt: Timestamp;
   updatedBy: string;
 }
 

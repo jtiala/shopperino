@@ -2,8 +2,9 @@ import React from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "react-router-dom";
+import { Query, documentId } from "firebase/firestore";
 
-import { auth, firestore, FieldPath } from "../firebase";
+import { auth, firestoreCompat } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 import { SubscribedShoppingList } from "../interfaces/SubscribedShoppingList";
 
@@ -22,10 +23,12 @@ const WithSubscribedShoppingLists: React.FC = () => {
     subscribedShoppingListsLoading,
     subscribedShoppingListsError,
   ] = useCollectionData<SubscribedShoppingList>(
-    firestore
+    firestoreCompat
       .collection("users")
       .doc(user?.uid)
-      .collection("subscribedShoppingLists"),
+      .collection(
+        "subscribedShoppingLists"
+      ) as unknown as Query<SubscribedShoppingList>,
     { idField: "id" }
   );
 
@@ -53,18 +56,15 @@ const WithPopulatedSubscribedShoppingLists: React.FC<{
 }> = ({ subscribedShoppingLists }) => {
   const [user] = useAuthState(auth);
 
-  const [
-    shoppingLists,
-    shoppingListsLoading,
-    shoppingListsError,
-  ] = useCollectionData<ShoppingList>(
-    firestore.collection("shoppingLists").where(
-      FieldPath.documentId(),
-      "in",
-      subscribedShoppingLists.map((list) => list.id)
-    ),
-    { idField: "id" }
-  );
+  const [shoppingLists, shoppingListsLoading, shoppingListsError] =
+    useCollectionData<ShoppingList>(
+      firestoreCompat.collection("shoppingLists").where(
+        documentId(),
+        "in",
+        subscribedShoppingLists.map((list) => list.id)
+      ) as unknown as Query<ShoppingList>,
+      { idField: "id" }
+    );
 
   if (shoppingListsLoading) {
     return <LoadingPage />;
@@ -82,14 +82,13 @@ const WithShoppingLists: React.FC<{
 }> = ({ shoppingLists: initialShoppingLists }) => {
   const [user] = useAuthState(auth);
 
-  const [
-    shoppingLists,
-    shoppingListsLoading,
-    shoppingListsError,
-  ] = useCollectionData<ShoppingList>(
-    firestore.collection("shoppingLists").where("createdBy", "==", user?.uid),
-    { idField: "id" }
-  );
+  const [shoppingLists, shoppingListsLoading, shoppingListsError] =
+    useCollectionData<ShoppingList>(
+      firestoreCompat
+        .collection("shoppingLists")
+        .where("createdBy", "==", user?.uid) as unknown as Query<ShoppingList>,
+      { idField: "id" }
+    );
 
   if (shoppingListsLoading) {
     return <LoadingPage />;

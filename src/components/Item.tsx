@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { auth, firestore } from "../firebase";
+import { auth, firestoreCompat } from "../firebase";
 import { ShoppingList } from "../interfaces/ShoppingList";
 import { ShoppingListItem } from "../interfaces/ShoppingListItem";
 
@@ -30,14 +30,14 @@ const Item: React.FC<Props> = ({ shoppingList, item }) => {
 
       setChecked(true);
 
-      firestore
+      firestoreCompat
         .collection("shoppingLists")
         .doc(shoppingList.id)
         .collection("items")
         .doc(item.id)
         .delete()
         .then(() => {
-          firestore
+          firestoreCompat
             .collection("shoppingLists")
             .doc(shoppingList.id)
             .update({
